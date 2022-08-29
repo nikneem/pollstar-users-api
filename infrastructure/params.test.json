@@ -3,10 +3,13 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "systemName": {
-      "value": "pollstar"
+      "value": "pollstar-users-api"
     },
     "environmentName": {
       "value": "test"
+    },
+    "locationAbbreviation": {
+      "value": "neu"
     }
   }
 }
