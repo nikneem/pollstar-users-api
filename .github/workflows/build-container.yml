@@ -32,10 +32,10 @@ jobs:
       - name: Build & Push
         working-directory: src
         run: |
-          docker build . --file Dockerfile --tag ${{ secrets.ACR_LOGIN_SERVER }}/pollstar-api:${{ steps.gitversion.outputs.MajorMinorPatch }}
-          docker build . --file Dockerfile --tag ${{ secrets.ACR_LOGIN_SERVER }}/pollstar-api:latest
-          docker push ${{ secrets.ACR_LOGIN_SERVER }}/pollstar-api:${{ steps.gitversion.outputs.MajorMinorPatch }}
-          docker push ${{ secrets.ACR_LOGIN_SERVER }}/pollstar-api:latest
+          docker build . --file Dockerfile --tag ${{ secrets.ACR_LOGIN_SERVER }}/pollstar-users-api:${{ steps.gitversion.outputs.MajorMinorPatch }}
+          docker build . --file Dockerfile --tag ${{ secrets.ACR_LOGIN_SERVER }}/pollstar-users-api:latest
+          docker push ${{ secrets.ACR_LOGIN_SERVER }}/pollstar-users-api:${{ steps.gitversion.outputs.MajorMinorPatch }}
+          docker push ${{ secrets.ACR_LOGIN_SERVER }}/pollstar-users-api:latest
 
   publish-bicep:
     runs-on: ubuntu-latest
