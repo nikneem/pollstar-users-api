@@ -4,6 +4,9 @@ on:
   push:
     branches: [main]
 
+env:
+  IMAGE_NAME: pollstar-users-api
+
 jobs:
   versionize:
     runs-on: ubuntu-latest
@@ -32,8 +35,8 @@ jobs:
       - name: Build container images
         working-directory: src
         run: |
-          docker build . --file Dockerfile --tag ${{ secrets.ACR_LOGIN_SERVER }}/pollstar-users-api:${{needs.versionize.outputs.semver}}
-          docker build . --file Dockerfile --tag ${{ secrets.ACR_LOGIN_SERVER }}/pollstar-users-api:latest
+          docker build . --file Dockerfile --tag ${{ secrets.ACR_LOGIN_SERVER }}/$IMAGE_NAME:${{needs.versionize.outputs.semver}}
+          docker build . --file Dockerfile --tag ${{ secrets.ACR_LOGIN_SERVER }}/$IMAGE_NAME:latest
       - name: Login to ACR
         uses: azure/docker-login@v1
         with:
@@ -43,8 +46,8 @@ jobs:
       - name: Push container images
         working-directory: src
         run: |
-          docker push ${{ secrets.ACR_LOGIN_SERVER }}/pollstar-users-api:${{needs.versionize.outputs.semver}}
-          docker push ${{ secrets.ACR_LOGIN_SERVER }}/pollstar-users-api:latest
+          docker push ${{ secrets.ACR_LOGIN_SERVER }}/$IMAGE_NAME:${{needs.versionize.outputs.semver}}
+          docker push ${{ secrets.ACR_LOGIN_SERVER }}/$IMAGE_NAME:latest
 
   publish-bicep:
     runs-on: ubuntu-latest
@@ -81,4 +84,4 @@ jobs:
         id: arm
         uses: Azure/cli@1.0.4
         with:
-          inlineScript: az deployment sub create --name pollstar-users-api  --location northeurope --template-file ./infrastructure/main.json --parameters ./infrastructure/params.test.json --parameters containerVersion=${{needs.versionize.outputs.semver}}
+          inlineScript: az deployment sub create --name $IMAGE_NAME  --location northeurope --template-file ./infrastructure/main.json --parameters ./infrastructure/params.test.json --parameters containerVersion=${{needs.versionize.outputs.semver}}
