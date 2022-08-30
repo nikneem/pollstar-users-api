@@ -29,17 +29,20 @@ jobs:
     needs: versionize
     steps:
       - uses: actions/checkout@v2
-      - name: "Push to Azure Container Registry"
+      - name: Build container images
+        working-directory: src
+        run: |
+          docker build . --file Dockerfile --tag ${{ secrets.ACR_LOGIN_SERVER }}/pollstar-users-api:${{needs.versionize.outputs.semver}}
+          docker build . --file Dockerfile --tag ${{ secrets.ACR_LOGIN_SERVER }}/pollstar-users-api:latest
+      - name: Login to ACR
         uses: azure/docker-login@v1
         with:
           login-server: ${{ secrets.ACR_LOGIN_SERVER }}
           username: ${{ secrets.ACR_USERNAME }}
           password: ${{ secrets.ACR_PASSWORD }}
-      - name: Build & Push
+      - name: Push container images
         working-directory: src
         run: |
-          docker build . --file Dockerfile --tag ${{ secrets.ACR_LOGIN_SERVER }}/pollstar-users-api:${{needs.versionize.outputs.semver}}
-          docker build . --file Dockerfile --tag ${{ secrets.ACR_LOGIN_SERVER }}/pollstar-users-api:latest
           docker push ${{ secrets.ACR_LOGIN_SERVER }}/pollstar-users-api:${{needs.versionize.outputs.semver}}
           docker push ${{ secrets.ACR_LOGIN_SERVER }}/pollstar-users-api:latest
 
