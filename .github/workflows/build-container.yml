@@ -22,7 +22,6 @@ jobs:
         uses: gittools/actions/gitversion/execute@v0.9.7
         with:
           useConfigFile: true
-
       - name: "Push to Azure Container Registry"
         uses: azure/docker-login@v1
         with:
