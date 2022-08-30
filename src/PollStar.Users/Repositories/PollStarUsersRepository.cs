@@ -16,7 +16,6 @@ namespace PollStar.Users.Repositories;
 public class PollStarUsersRepository : IPollStarUsersRepository
 {
     private readonly ILogger<PollStarUsersRepository> _logger;
-    private readonly ICacheClient _cacheClient;
     private TableClient _tableClient;
     private const string TableName = "users";
     private const string PartitionKey = "user";
@@ -24,7 +23,7 @@ public class PollStarUsersRepository : IPollStarUsersRepository
     public async Task<UserDto> GetAsync(Guid userId)
     {
         var redisCacheKey = $"users:{userId}";
-        var userEntity =  await _cacheClient.GetOrInitializeAsync(() => GetUserByUserIsAsync(userId), redisCacheKey);
+        var userEntity = await GetUserByUserIsAsync(userId); //await _cacheClient.GetOrInitializeAsync(() => GetUserByUserIsAsync(userId), redisCacheKey);
         if (userEntity != null)
         {
             return new UserDto
@@ -73,12 +72,10 @@ public class PollStarUsersRepository : IPollStarUsersRepository
     }
 
     public PollStarUsersRepository(
-        ICacheClientFactory cacheClientFactory,
         IOptions<AzureConfiguration> options,
         ILogger<PollStarUsersRepository> logger)
     {
         _logger = logger;
-        _cacheClient = cacheClientFactory.CreateClient(Constants.DefaultCacheClientName);
         var accountName = options.Value.StorageAccount;
         var accountKey = options.Value.StorageKey;
         var storageUri = new Uri($"https://{accountName}.table.core.windows.net");
