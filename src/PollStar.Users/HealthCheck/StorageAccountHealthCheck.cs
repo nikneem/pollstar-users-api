@@ -10,7 +10,7 @@ namespace PollStar.Users.HealthCheck;
         private const string TableName = "users";
         private readonly IOptions<AzureConfiguration> _configOptions;
 
-        public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = new CancellationToken())
+        public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = new())
         {
             var config = _configOptions.Value;
             try
