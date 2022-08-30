@@ -9,6 +9,7 @@
   <ItemGroup>
     <PackageReference Include="Azure.Data.Tables" Version="12.6.1" />
     <PackageReference Include="HexMaster.RedisCache.Abstractions" Version="0.1.6" />
+    <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.Abstractions" Version="6.0.8" />
     <PackageReference Include="Microsoft.Extensions.Options" Version="6.0.0" />
     <PackageReference Include="PollStar.Core" Version="0.1.2" />
   </ItemGroup>
@@ -18,6 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="HealthCheck\" />
     <Folder Include="Services\" />
   </ItemGroup>
 

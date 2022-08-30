@@ -1,6 +1,7 @@
 
 using PollStar.Core.Configuration;
 using PollStar.Users;
+using PollStar.Users.HealthCheck;
 
 const string defaultCorsPolicyName = "default_cors";
 
@@ -12,7 +13,8 @@ builder.Services.Configure<AzureConfiguration>(
 // Add services to the container.
 builder.Services.AddPollStarUsers();
 
-builder.Services.AddHealthChecks();
+builder.Services.AddHealthChecks()
+    .AddCheck<StorageAccountHealthCheck>("StorageAccountHealthCheck");
 
 builder.Services.AddCors(options =>
 {
