@@ -1,20 +1,17 @@
 
 using PollStar.Core.Configuration;
+using PollStar.Core.Exceptions;
 using PollStar.Users;
-using PollStar.Users.HealthCheck;
 
 const string defaultCorsPolicyName = "default_cors";
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.Configure<AzureConfiguration>(
-    builder.Configuration.GetSection(AzureConfiguration.SectionName));
 
-// Add services to the container.
+builder.Services.AddPollStarCore(builder.Configuration);
 builder.Services.AddPollStarUsers();
 
-builder.Services.AddHealthChecks()
-    .AddCheck<StorageAccountHealthCheck>("StorageAccountHealthCheck");
+
 
 builder.Services.AddCors(options =>
 {
@@ -33,8 +30,7 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddApplicationInsightsTelemetry();
 
-builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddControllers(options => { options.Filters.Add(typeof(PollStarExceptionsFilter)); });
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
