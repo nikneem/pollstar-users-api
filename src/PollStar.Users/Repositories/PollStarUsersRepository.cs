@@ -35,18 +35,18 @@ public class PollStarUsersRepository : IPollStarUsersRepository
     }
     public async Task<UserDto?> GetAsync(Guid userId)
     {
-        _logger.LogInformation("Fetching user from repository");
+        _logger.LogTrace("Fetching user from repository");
         var userEntity = await GetUserByUserIsAsync(userId);
         if (userEntity != null)
         {
-            _logger.LogInformation("User found, returning appropriate information");
+            _logger.LogTrace("User found, returning appropriate information");
             return new UserDto
             {
                 UserId = Guid.Parse(userEntity.RowKey)
             };
         }
 
-        _logger.LogInformation("Oops, user not found, returning null reference");
+        _logger.LogTrace("Oops, user not found, returning null reference");
         return null;
     }
 

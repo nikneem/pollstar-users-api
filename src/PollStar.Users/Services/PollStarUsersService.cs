@@ -15,7 +15,7 @@ public class PollStarUsersService : IPollStarUsersService
     public async Task<UserDto> Create()
     {
         var userId = Guid.NewGuid();
-        _logger.LogInformation("New user GUID {userId} generated", userId);
+        _logger.LogTrace("New user GUID {userId} generated", userId);
         try
         {
             if (await _repository.CreateAsync(userId))
