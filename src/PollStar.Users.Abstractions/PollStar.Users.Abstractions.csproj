@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="PollStar.Core" Version="1.0.0" />
+    <PackageReference Include="PollStar.Core" Version="1.0.2" />
   </ItemGroup>
 
 </Project>
