@@ -87,7 +87,7 @@ resource apiContainerApp 'Microsoft.App/containerApps@2022-03-01' = {
           env: [
             {
               name: 'Azure__StorageAccount'
-              value: storageAccount.name
+              value: '${storageAccount.name}error'
             }
             {
               name: 'Azure__StorageKey'
