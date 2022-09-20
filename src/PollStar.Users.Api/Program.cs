@@ -1,17 +1,15 @@
 
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using PollStar.Core.Configuration;
 using PollStar.Core.Exceptions;
+using PollStar.Core.HealthChecks;
 using PollStar.Users;
 
 const string defaultCorsPolicyName = "default_cors";
 
 var builder = WebApplication.CreateBuilder(args);
-
-
 builder.Services.AddPollStarCore(builder.Configuration);
 builder.Services.AddPollStarUsers();
-
-
 
 builder.Services.AddCors(options =>
 {
@@ -29,7 +27,6 @@ builder.Services.AddCors(options =>
 });
 
 builder.Services.AddApplicationInsightsTelemetry();
-
 builder.Services.AddControllers(options => { options.Filters.Add(typeof(PollStarExceptionsFilter)); });
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -50,7 +47,10 @@ app.UseRouting();
 app.UseAuthorization();
 app.UseEndpoints(ep =>
 {
-    ep.MapHealthChecks("/health");
+    ep.MapHealthChecks("/health", new HealthCheckOptions
+    {
+         ResponseWriter = HealthCheckExtensions.WriteResponse
+    });
     ep.MapControllers();
 });
 
