@@ -79,7 +79,7 @@ jobs:
       - name: Azure Login
         uses: azure/login@v1
         with:
-          creds: ${{ secrets.AZURE_TEST }}
+          creds: ${{ secrets.AZURE_PROD }}
       - name: Deploy Infrastructure
         id: arm
         uses: Azure/cli@v1
