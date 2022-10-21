@@ -1,22 +1,16 @@
 ﻿using Azure;
-using Azure.Data.Tables;
-using HexMaster.RedisCache.Abstractions;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using PollStar.Core;
-using PollStar.Core.Configuration;
+using PollStar.Core.Factories;
 using PollStar.Users.Abstractions.DataTransferObjects;
 using PollStar.Users.Abstractions.Repositories;
 using PollStar.Users.Repositories.Entities;
-using Constants = HexMaster.RedisCache.Abstractions.Constants;
 
 namespace PollStar.Users.Repositories;
 
 public class PollStarUsersRepository : IPollStarUsersRepository
 {
+    private readonly IStorageTableClientFactory _tableClientFactory;
     private readonly ILogger<PollStarUsersRepository> _logger;
-    private TableClient _tableClient;
     private const string TableName = "users";
     private const string PartitionKey = "user";
 
@@ -29,8 +23,9 @@ public class PollStarUsersRepository : IPollStarUsersRepository
             Timestamp = DateTimeOffset.UtcNow,
             ETag = ETag.All
         };
+        var tableClient = _tableClientFactory.CreateClient(TableName);
         _logger.LogInformation("Now storing user in users repository");
-        var response = await _tableClient.AddEntityAsync(entity);
+        var response = await tableClient.AddEntityAsync(entity);
         return !response.IsError;
     }
     public async Task<UserDto?> GetAsync(Guid userId)
@@ -54,7 +49,8 @@ public class PollStarUsersRepository : IPollStarUsersRepository
     {
         try
         {
-            var response = await _tableClient.GetEntityAsync<UserTableEntity>(PartitionKey, userId.ToString());
+            var tableClient = _tableClientFactory.CreateClient(TableName);
+            var response = await tableClient.GetEntityAsync<UserTableEntity>(PartitionKey, userId.ToString());
             return response.Value;
         }
         catch (Exception ex)
@@ -65,17 +61,11 @@ public class PollStarUsersRepository : IPollStarUsersRepository
     }
 
     public PollStarUsersRepository(
-        IOptions<AzureConfiguration> options,
+        IStorageTableClientFactory tableClientFactory,
         ILogger<PollStarUsersRepository> logger)
     {
+        _tableClientFactory = tableClientFactory;
         _logger = logger;
-        var accountName = options.Value.StorageAccount;
-        var accountKey = options.Value.StorageKey;
-        var storageUri = new Uri($"https://{accountName}.table.core.windows.net");
-        _tableClient = new TableClient(
-            storageUri,
-            TableName,
-            new TableSharedKeyCredential(accountName, accountKey));
     }
 
 }

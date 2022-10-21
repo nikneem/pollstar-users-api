@@ -9,9 +9,9 @@
   <ItemGroup>
     <PackageReference Include="Azure.Data.Tables" Version="12.6.1" />
     <PackageReference Include="HexMaster.RedisCache.Abstractions" Version="0.1.6" />
-    <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.Abstractions" Version="6.0.9" />
+    <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.Abstractions" Version="6.0.10" />
     <PackageReference Include="Microsoft.Extensions.Options" Version="6.0.0" />
-    <PackageReference Include="PollStar.Core" Version="1.0.5" />
+    <PackageReference Include="PollStar.Core" Version="1.4.4" />
   </ItemGroup>
 
   <ItemGroup>

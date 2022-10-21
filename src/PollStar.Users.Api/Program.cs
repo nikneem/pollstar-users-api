@@ -1,13 +1,32 @@
 
+using Azure.Identity;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using PollStar.Core.Configuration;
 using PollStar.Core.Exceptions;
+using PollStar.Core.ExtensionMethods;
 using PollStar.Core.HealthChecks;
 using PollStar.Users;
 
 const string defaultCorsPolicyName = "default_cors";
 
 var builder = WebApplication.CreateBuilder(args);
+
+var azureCredential = new DefaultAzureCredential(true);
+try
+{
+    builder.Configuration.AddAzureAppConfiguration(options =>
+    {
+        options.Connect(new Uri(builder.Configuration.GetRequiredValue("AzureAppConfiguration")), azureCredential)
+            .ConfigureKeyVault(kv => kv.SetCredential(azureCredential))
+            .UseFeatureFlags();
+    });
+}
+catch (Exception ex)
+{
+    Console.WriteLine(ex);
+}
+
+
 builder.Services.AddPollStarCore(builder.Configuration);
 builder.Services.AddPollStarUsers();
 

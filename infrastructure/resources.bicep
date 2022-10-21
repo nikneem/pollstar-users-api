@@ -5,17 +5,27 @@ param containerVersion string
 param environmentName string
 param integrationResourceGroupName string
 param containerAppEnvironmentResourceName string
-param applicationInsightsResourceName string
+param azureAppConfigurationName string
+param developersGroup string
 
 param containerPort int = 80
 param containerAppName string = 'pollstar-users-api'
+
+resource configurationDataReaderRole 'Microsoft.Authorization/roleDefinitions@2018-01-01-preview' existing = {
+  scope: resourceGroup()
+  name: '516239f1-63e1-4d78-a4de-a74fb236a071'
+}
+resource storageAccountDataReaderRole 'Microsoft.Authorization/roleDefinitions@2018-01-01-preview' existing = {
+  scope: resourceGroup()
+  name: 'b24988ac-6180-42a0-ab88-20f7382dd24c'
+}
 
 resource containerAppEnvironments 'Microsoft.App/managedEnvironments@2022-03-01' existing = {
   name: containerAppEnvironmentResourceName
   scope: resourceGroup(integrationResourceGroupName)
 }
-resource applicationInsights 'Microsoft.Insights/components@2020-02-02' existing = {
-  name: applicationInsightsResourceName
+resource appConfiguration 'Microsoft.AppConfiguration/configurationStores@2022-05-01' existing = {
+  name: azureAppConfigurationName
   scope: resourceGroup(integrationResourceGroupName)
 }
 
@@ -47,16 +57,6 @@ resource apiContainerApp 'Microsoft.App/containerApps@2022-03-01' = {
 
     configuration: {
       activeRevisionsMode: 'Single'
-      secrets: [
-        {
-          name: 'storage-account-secret'
-          value: listKeys(storageAccount.id, storageAccount.apiVersion).keys[0].value
-        }
-        {
-          name: 'application-insights-connectionstring'
-          value: applicationInsights.properties.ConnectionString
-        }
-      ]
       ingress: {
         external: false
         targetPort: containerPort
@@ -90,12 +90,8 @@ resource apiContainerApp 'Microsoft.App/containerApps@2022-03-01' = {
               value: storageAccount.name
             }
             {
-              name: 'Azure__StorageKey'
-              secretRef: 'storage-account-secret'
-            }
-            {
-              name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
-              secretRef: 'application-insights-connectionstring'
+              name: 'AzureAppConfiguration'
+              value: appConfiguration.properties.endpoint
             }
           ]
 
@@ -116,5 +112,31 @@ resource apiContainerApp 'Microsoft.App/containerApps@2022-03-01' = {
         ]
       }
     }
+  }
+}
+
+module configurationReaderRoleAssignment 'roleAssignment.bicep' = {
+  name: 'configurationReaderRoleAssignmentModule'
+  scope: resourceGroup(integrationResourceGroupName)
+  params: {
+    principalId: apiContainerApp.identity.principalId
+    roleDefinitionId: configurationDataReaderRole.id
+  }
+}
+module storageAccountDataReaderRoleAssignment 'roleAssignment.bicep' = {
+  name: 'storageAccountDataReaderRoleAssignmentModule'
+  scope: resourceGroup()
+  params: {
+    principalId: apiContainerApp.identity.principalId
+    roleDefinitionId: storageAccountDataReaderRole.id
+  }
+}
+module storageAccountDataReaderRoleAssignmentForDevelopers 'roleAssignment.bicep' = {
+  name: 'storageAccountDataReaderRoleAssignmentForDevelopersModule'
+  scope: resourceGroup()
+  params: {
+    principalId: developersGroup
+    roleDefinitionId: storageAccountDataReaderRole.id
+    principalType: 'Group'
   }
 }
