@@ -15,9 +15,9 @@ resource configurationDataReaderRole 'Microsoft.Authorization/roleDefinitions@20
   scope: resourceGroup()
   name: '516239f1-63e1-4d78-a4de-a74fb236a071'
 }
-resource storageAccountDataReaderRole 'Microsoft.Authorization/roleDefinitions@2018-01-01-preview' existing = {
+resource storageAccountDataContributorRole 'Microsoft.Authorization/roleDefinitions@2018-01-01-preview' existing = {
   scope: resourceGroup()
-  name: 'b24988ac-6180-42a0-ab88-20f7382dd24c'
+  name: '0a9a7e1f-b9d0-4cc4-a60d-0319b160aaa3'
 }
 
 resource containerAppEnvironments 'Microsoft.App/managedEnvironments@2022-03-01' existing = {
@@ -128,7 +128,7 @@ module storageAccountDataReaderRoleAssignment 'roleAssignment.bicep' = {
   scope: resourceGroup()
   params: {
     principalId: apiContainerApp.identity.principalId
-    roleDefinitionId: storageAccountDataReaderRole.id
+    roleDefinitionId: storageAccountDataContributorRole.id
   }
 }
 module storageAccountDataReaderRoleAssignmentForDevelopers 'roleAssignment.bicep' = {
@@ -136,7 +136,7 @@ module storageAccountDataReaderRoleAssignmentForDevelopers 'roleAssignment.bicep
   scope: resourceGroup()
   params: {
     principalId: developersGroup
-    roleDefinitionId: storageAccountDataReaderRole.id
+    roleDefinitionId: storageAccountDataContributorRole.id
     principalType: 'Group'
   }
 }
