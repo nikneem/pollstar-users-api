@@ -11,15 +11,6 @@ param developersGroup string
 param containerPort int = 80
 param containerAppName string = 'pollstar-users-api'
 
-resource configurationDataReaderRole 'Microsoft.Authorization/roleDefinitions@2018-01-01-preview' existing = {
-  scope: resourceGroup()
-  name: '516239f1-63e1-4d78-a4de-a74fb236a071'
-}
-resource storageAccountDataContributorRole 'Microsoft.Authorization/roleDefinitions@2018-01-01-preview' existing = {
-  scope: resourceGroup()
-  name: '0a9a7e1f-b9d0-4cc4-a60d-0319b160aaa3'
-}
-
 resource containerAppEnvironments 'Microsoft.App/managedEnvironments@2022-03-01' existing = {
   name: containerAppEnvironmentResourceName
   scope: resourceGroup(integrationResourceGroupName)
@@ -115,13 +106,9 @@ resource apiContainerApp 'Microsoft.App/containerApps@2022-03-01' = {
   }
 }
 
-module configurationReaderRoleAssignment 'roleAssignment.bicep' = {
-  name: 'configurationReaderRoleAssignmentModule'
-  scope: resourceGroup(integrationResourceGroupName)
-  params: {
-    principalId: apiContainerApp.identity.principalId
-    roleDefinitionId: configurationDataReaderRole.id
-  }
+resource storageAccountDataContributorRole 'Microsoft.Authorization/roleDefinitions@2018-01-01-preview' existing = {
+  scope: resourceGroup()
+  name: '0a9a7e1f-b9d0-4cc4-a60d-0319b160aaa3'
 }
 module storageAccountDataReaderRoleAssignment 'roleAssignment.bicep' = {
   name: 'storageAccountDataReaderRoleAssignmentModule'
@@ -138,6 +125,19 @@ module storageAccountDataReaderRoleAssignmentForDevelopers 'roleAssignment.bicep
     principalId: developersGroup
     roleDefinitionId: storageAccountDataContributorRole.id
     principalType: 'Group'
+  }
+}
+
+resource configurationDataReaderRole 'Microsoft.Authorization/roleDefinitions@2018-01-01-preview' existing = {
+  scope: resourceGroup()
+  name: '516239f1-63e1-4d78-a4de-a74fb236a071'
+}
+module configurationReaderRoleAssignment 'roleAssignment.bicep' = {
+  name: 'configurationReaderRoleAssignmentModule'
+  scope: resourceGroup(integrationResourceGroupName)
+  params: {
+    principalId: apiContainerApp.identity.principalId
+    roleDefinitionId: configurationDataReaderRole.id
   }
 }
 
