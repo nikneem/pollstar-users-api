@@ -23,10 +23,18 @@ public class PollStarUsersRepository : IPollStarUsersRepository
             Timestamp = DateTimeOffset.UtcNow,
             ETag = ETag.All
         };
-        var tableClient = _tableClientFactory.CreateClient(TableName);
-        _logger.LogInformation("Now storing user in users repository");
-        var response = await tableClient.AddEntityAsync(entity);
-        return !response.IsError;
+        try
+        {
+            var tableClient = _tableClientFactory.CreateClient(TableName);
+            _logger.LogInformation("Now storing user in users repository");
+            var response = await tableClient.AddEntityAsync(entity);
+            return !response.IsError;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to create user information in storage table");
+            return false;
+        }
     }
     public async Task<UserDto?> GetAsync(Guid userId)
     {

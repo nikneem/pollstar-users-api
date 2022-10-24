@@ -11,7 +11,7 @@ const string defaultCorsPolicyName = "default_cors";
 
 var builder = WebApplication.CreateBuilder(args);
 
-var azureCredential = new DefaultAzureCredential(true);
+var azureCredential = new DefaultAzureCredential();
 try
 {
     builder.Configuration.AddAzureAppConfiguration(options =>
@@ -23,7 +23,7 @@ try
 }
 catch (Exception ex)
 {
-    Console.WriteLine(ex);
+    throw new Exception("Configuration failed", ex);
 }
 
 
