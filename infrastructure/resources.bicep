@@ -20,6 +20,10 @@ resource storageAccountDataContributorRole 'Microsoft.Authorization/roleDefiniti
   scope: resourceGroup()
   name: '0a9a7e1f-b9d0-4cc4-a60d-0319b160aaa3'
 }
+resource accessSecretsRole 'Microsoft.Authorization/roleDefinitions@2018-01-01-preview' existing = {
+  scope: resourceGroup()
+  name: '4633458b-17de-408a-b874-0445c86b69e6'
+}
 
 resource containerAppEnvironments 'Microsoft.App/managedEnvironments@2022-03-01' existing = {
   name: containerAppEnvironmentResourceName
@@ -130,6 +134,14 @@ module storageAccountDataReaderRoleAssignment 'roleAssignment.bicep' = {
   params: {
     principalId: apiContainerApp.identity.principalId
     roleDefinitionId: storageAccountDataContributorRole.id
+  }
+}
+module keyVaultSecretsAccessRoleAssignment 'roleAssignment.bicep' = {
+  name: 'keyVaultSecretsAccessRoleAssignmentModule'
+  scope: resourceGroup()
+  params: {
+    principalId: apiContainerApp.identity.principalId
+    roleDefinitionId: accessSecretsRole.id
   }
 }
 module storageAccountDataReaderRoleAssignmentForDevelopers 'roleAssignment.bicep' = {
