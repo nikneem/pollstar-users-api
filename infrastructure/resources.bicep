@@ -7,7 +7,6 @@ param integrationResourceGroupName string
 param containerAppEnvironmentResourceName string
 param azureAppConfigurationName string
 param developersGroup string
-param azureIntegrationKeyVaultName string
 
 param containerPort int = 80
 param containerAppName string = 'pollstar-users-api'
@@ -19,10 +18,6 @@ resource configurationDataReaderRole 'Microsoft.Authorization/roleDefinitions@20
 resource storageAccountDataContributorRole 'Microsoft.Authorization/roleDefinitions@2018-01-01-preview' existing = {
   scope: resourceGroup()
   name: '0a9a7e1f-b9d0-4cc4-a60d-0319b160aaa3'
-}
-resource accessSecretsRole 'Microsoft.Authorization/roleDefinitions@2018-01-01-preview' existing = {
-  scope: resourceGroup()
-  name: '4633458b-17de-408a-b874-0445c86b69e6'
 }
 
 resource containerAppEnvironments 'Microsoft.App/managedEnvironments@2022-03-01' existing = {
@@ -136,14 +131,6 @@ module storageAccountDataReaderRoleAssignment 'roleAssignment.bicep' = {
     roleDefinitionId: storageAccountDataContributorRole.id
   }
 }
-module keyVaultSecretsAccessRoleAssignment 'roleAssignment.bicep' = {
-  name: 'keyVaultSecretsAccessRoleAssignmentModule'
-  scope: resourceGroup()
-  params: {
-    principalId: apiContainerApp.identity.principalId
-    roleDefinitionId: accessSecretsRole.id
-  }
-}
 module storageAccountDataReaderRoleAssignmentForDevelopers 'roleAssignment.bicep' = {
   name: 'storageAccountDataReaderRoleAssignmentForDevelopersModule'
   scope: resourceGroup()
@@ -153,11 +140,16 @@ module storageAccountDataReaderRoleAssignmentForDevelopers 'roleAssignment.bicep
     principalType: 'Group'
   }
 }
-module keyVaultAccessPolicies 'accessPolicies.bicep' = {
-  name: 'keyVaultAccessPoliciesModule'
-  scope: resourceGroup(integrationResourceGroupName)
+
+resource accessSecretsRole 'Microsoft.Authorization/roleDefinitions@2018-01-01-preview' existing = {
+  scope: resourceGroup()
+  name: '4633458b-17de-408a-b874-0445c86b69e6'
+}
+module keyVaultSecretsAccessRoleAssignment 'roleAssignment.bicep' = {
+  name: 'keyVaultSecretsAccessRoleAssignmentModule'
+  scope: resourceGroup()
   params: {
-    keyVaultName: azureIntegrationKeyVaultName
     principalId: apiContainerApp.identity.principalId
+    roleDefinitionId: accessSecretsRole.id
   }
 }
